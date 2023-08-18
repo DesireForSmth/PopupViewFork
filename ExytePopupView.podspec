@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/exyte/PopupView.git', :tag => s.version.to_s }
   s.social_media_url = 'http://exyte.com'
 
-  s.ios.deployment_target = '15.0'
+  s.ios.deployment_target = '14.0'
   s.osx.deployment_target = '11.0'
   s.tvos.deployment_target = '14.0'
   s.watchos.deployment_target = '7.0'
