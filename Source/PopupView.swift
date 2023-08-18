@@ -26,6 +26,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
          dismissCallback: @escaping (DismissSource)->()) {
 
         self.position = params.position ?? params.type.defaultPosition
+        self.ignoreKeyboard = params.ignoreKeyboard
         self.appearFrom = params.appearFrom
         self.verticalPadding = params.type.verticalPadding
         self.horizontalPadding = params.type.horizontalPadding
@@ -151,6 +152,10 @@ public struct Popup<PopupContent: View>: ViewModifier {
 
         /// If true taps do not pass through popup's background and the popup is displayed on top of navbar. Always opaque if closeOnTapOutside is true
         var isOpaque: Bool = false
+        
+        /// If true popup appears under keyboard
+        ///  False by default
+        var ignoreKeyboard: Bool = false
 
         var dismissCallback: (DismissSource) -> () = {_ in}
 
@@ -233,6 +238,12 @@ public struct Popup<PopupContent: View>: ViewModifier {
             }
             return params
         }
+        
+        public func ignoreKeyboard(_ ignore: Bool) -> PopupParameters {
+            var params = self
+            params.ignoreKeyboard = ignore
+            return params
+        }
     }
 
     private enum DragState {
@@ -265,6 +276,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
     var verticalPadding: CGFloat
     var horizontalPadding: CGFloat
     var useSafeAreaInset: Bool
+    var ignoreKeyboard: Bool
 
     var animation: Animation
 
@@ -322,6 +334,9 @@ public struct Popup<PopupContent: View>: ViewModifier {
                 return (screenHeight - sheetContentRect.height)/2 - safeAreaInsets.top
             }
             if position.isBottom {
+                if ignoreKeyboard {
+                    return screenHeight - sheetContentRect.height - verticalPadding + (useSafeAreaInset ? -safeAreaInsets.bottom : 0) - safeAreaInsets.top
+                }
                 return screenHeight - sheetContentRect.height - keyboardHeightHelper.keyboardHeight - verticalPadding + (useSafeAreaInset ? -safeAreaInsets.bottom : 0) - safeAreaInsets.top
             }
         }
@@ -333,6 +348,9 @@ public struct Popup<PopupContent: View>: ViewModifier {
             return (presenterContentRect.height - sheetContentRect.height)/2
         }
         if position.isBottom {
+            if ignoreKeyboard {
+                return presenterContentRect.height - sheetContentRect.height + safeAreaInsets.bottom - verticalPadding + (useSafeAreaInset ? -safeAreaInsets.bottom : 0)
+            }
             return presenterContentRect.height - sheetContentRect.height - keyboardHeightHelper.keyboardHeight + safeAreaInsets.bottom - verticalPadding + (useSafeAreaInset ? -safeAreaInsets.bottom : 0)
         }
         return 0
